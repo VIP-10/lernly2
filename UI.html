@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lernly - Your Study Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f23;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+        }
+
+        .shape1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape2 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            bottom: 100px;
+            left: -50px;
+            animation: float 15s infinite ease-in-out reverse;
+        }
+
+        .shape3 {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+            top: 50%;
+            right: 10%;
+            animation: float 18s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 24px;
+            border-radius: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .exam-countdown {
+            background: rgba(102, 126, 234, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exam-countdown::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        .exam-countdown .days {
+            font-size: 24px;
+            font-weight: 700;
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .avatar-character {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .profile-name {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Main Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Card Base */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Today's Mission */
+        .mission-card {
+            grid-column: 1;
+        }
+
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .mission-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .date-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mission-main-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mascot-small {
+            width: 48px;
+            height: 48px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .session-step {
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .session-step:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(8px);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .session-step:hover::before {
+            transform: scaleY(1);
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .step-time {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            align-self: center;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .start-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .start-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Readiness Metrics */
+        .metrics-card {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .metric:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .metric-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 48px;
+            opacity: 0.2;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .metric-value {
+            font-size: 52px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric.application .metric-value {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .metric-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-top: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 5px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .metric.application .metric-bar-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .at-risk-card {
+            grid-column: span 2;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .character-mascot {
+            width: 40px;
+            height: 40px;
+            animation: wiggle 3s infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .at-risk-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .at-risk-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .at-risk-item:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: translateX(4px);
+        }
+
+        .at-risk-concept {
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .decay-icon {
+            font-size: 20px;
+        }
+
+        .at-risk-time {
+            font-size: 13px;
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .streak-card {
+            text-align: center;
+            position: relative;
+        }
+
+        .streak-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 24px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .streak-card:hover::before {
+            opacity: 0.3;
+        }
+
+        .streak-emoji {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: flicker 1.5s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .streak-number {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .streak-label {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .progress-ring {
+            width: 140px;
+            height: 140px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .progress-ring .bg {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-ring .progress {
+            stroke: url(#gradient);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-label {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .at-risk-card {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-icon">🧠</div>
+                <div class="logo">Lernly</div>
+            </div>
+            <div class="header-right">
+                <div class="exam-countdown">
+                    <span class="days">68</span>
+                    days until MCAT
+                </div>
+                <div class="profile-section">
+                    <div class="profile-avatar">
+                        <svg class="avatar-character" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="50" cy="50" r="50" fill="#667eea"/>
+                            <circle cx="35" cy="40" r="5" fill="white"/>
+                            <circle cx="65" cy="40" r="5" fill="white"/>
+                            <path d="M 30 60 Q 50 75 70 60" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <circle cx="50" cy="25" r="15" fill="#764ba2"/>
+                        </svg>
+                    </div>
+                    <span class="profile-name">Jordan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card mission-card">
+                <div class="mission-header">
+                    <span class="mission-title">Today's Mission</span>
+                    <span class="date-badge">Tuesday, Feb 4</span>
+                </div>
+                
+                <h2 class="mission-main-title">
+                    <svg class="mascot-small" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" fill="#667eea"/>
+                        <circle cx="35" cy="45" r="6" fill="white"/>
+                        <circle cx="65" cy="45" r="6" fill="white"/>
+                        <circle cx="37" cy="45" r="3" fill="#0f0f23"/>
+                        <circle cx="67" cy="45" r="3" fill="#0f0f23"/>
+                        <path d="M 30 60 Q 50 70 70 60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <rect x="40" y="15" width="20" height="15" fill="#764ba2" rx="3"/>
+                        <circle cx="42" cy="28" r="3" fill="#f59e0b"/>
+                        <circle cx="58" cy="28" r="3" fill="#f59e0b"/>
+                    </svg>
+                    Your Session Today
+                </h2>
+
+                <div class="session-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Micro-Repair Warm-up</div>
+                        <div class="step-subtitle">Fix 3 concepts showing decay</div>
+                    </div>
+                    <div class="step-time">8 min</div>
+                </div>
+
+                <div class="session-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">New Content: Enzyme Kinetics</div>
+                        <div class="step-subtitle">Kaplan Ch 4.2, Khan Academy video</div>
+                    </div>
+                    <div class="step-time">35 min</div>
+                </div>
+
+                <div class="session-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Cumulative Quiz</div>
+                        <div class="step-subtitle">Test everything you've learned so far</div>
+                    </div>
+                    <div class="step-time">12 min</div>
+                </div>
+
+                <button class="start-btn"><span>🚀 Start Session</span></button>
+            </div>
+
+            <div class="metrics-card">
+                <div class="metric retention">
+                    <span class="metric-icon">🧠</span>
+                    <div class="metric-label">Retention Strength</div>
+                    <div class="metric-value">78%</div>
+                    <div class="metric-change">
+                        <span>↗</span> +3% this week
+                    </div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" style="width: 78%"></div>
+                    </div>
+                </div>
+
+                <div class="metric application">
+                    <span class="metric-icon">⚡</span>
+                    <div class="metric-label">Application Fluidity</div>
+                    <div class="metric-value">82%</div>
+                    <div class="metric-change">
+                        <span>↗</span> +5% this week
+                    </div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" style="width: 82%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-grid">
+            <div class="card at-risk-card">
+                <h3 class="card-title">
+                    <svg class="character-mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" fill="#f59e0b"/>
+                        <circle cx="35" cy="45" r="6" fill="white"/>
+                        <circle cx="65" cy="45" r="6" fill="white"/>
+                        <circle cx="37" cy="45" r="3" fill="#0f0f23"/>
+                        <circle cx="67" cy="45" r="3" fill="#0f0f23"/>
+                        <path d="M 35 65 Q 50 55 65 65" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path d="M 30 35 L 25 25" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M 70 35 L 75 25" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    At Risk - Need Attention
+                </h3>
+                <div class="at-risk-list">
+                    <div class="at-risk-item">
+                        <span class="at-risk-concept">
+                            <span class="decay-icon">⚠️</span>
+                            Glycolysis intermediates
+                        </span>
+                        <span class="at-risk-time">Learned 9 days ago</span>
+                    </div>
+                    <div class="at-risk-item">
+                        <span class="at-risk-concept">
+                            <span class="decay-icon">⚠️</span>
+                            Newton's 2nd Law applications
+                        </span>
+                        <span class="at-risk-time">Learned 12 days ago</span>
+                    </div>
+                    <div class="at-risk-item">
+                        <span class="at-risk-concept">
+                            <span class="decay-icon">⚠️</span>
+                            Acid-Base titration curves
+                        </span>
+                        <span class="at-risk-time">Learned 8 days ago</span>
+                    </div>
+                    <div class="at-risk-item">
+                        <span class="at-risk-concept">
+                            <span class="decay-icon">⚠️</span>
+                            DNA replication enzymes
+                        </span>
+                        <span class="at-risk-time">Learned 11 days ago</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card streak-card">
+                <h3 class="card-title">Streak</h3>
+                <div class="streak-emoji">🔥</div>
+                <div class="streak-number">6</div>
+                <div class="streak-label">days in a row</div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">
+                    <svg class="character-mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" fill="#10b981"/>
+                        <circle cx="35" cy="45" r="6" fill="white"/>
+                        <circle cx="65" cy="45" r="6" fill="white"/>
+                        <circle cx="37" cy="45" r="3" fill="#0f0f23"/>
+                        <circle cx="67" cy="45" r="3" fill="#0f0f23"/>
+                        <path d="M 30 55 Q 50 70 70 55" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <polygon points="50,20 55,30 45,30" fill="#fbbf24"/>
+                    </svg>
+                    Progress
+                </h3>
+                <div class="progress-ring">
+                    <svg width="140" height="140">
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="bg" cx="70" cy="70" r="60"/>
+                        <circle class="progress" cx="70" cy="70" r="60"
+                            stroke-dasharray="377"
+                            stroke-dashoffset="158"/>
+                    </svg>
+                    <div class="progress-text">58%</div>
+                </div>
+                <div class="progress-label">Content mastered</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
